@@ -1,3 +1,4 @@
+import { setPersistence, browserLocalPersistence } from "firebase/auth";
 import { getAuth, createUserWithEmailAndPassword, signInWithEmailAndPassword, signInWithRedirect } from "firebase/auth";
 import {app} from '../firebase/Database';
 import {useEffect, useState} from 'react';
@@ -9,15 +10,23 @@ import '../styles.css';
 
 function Login() {
 
-    const [username, setUsername] = useState('')
+    const [email, setEmail] = useState('')
     const [password, setPassword] = useState('')
     const auth = getAuth(app);
     const [user, loading, error] = useAuthState(auth);
     const navigate = useNavigate();
 
-    const loginAttempt = (username, password) => {
+    const loginAttempt = (email, password) => {
         console.log(password);
-        signInWithEmailAndPassword(auth, username, password)
+        setPersistence(auth, browserLocalPersistence)
+        .then(() => {
+          // Existing and future Auth states are now persisted in the current
+          // session only. Closing the window would clear any existing state even
+          // if a user forgets to sign out.
+          // ...
+          // New sign-in will be persisted with session persistence.
+          return signInWithEmailAndPassword(auth, email, password);
+        })
         .then((userCredential) => {
             // Signed in 
             const user = userCredential.user;
@@ -27,10 +36,9 @@ function Login() {
             // ...
         })
         .catch((error) => {
-            console.log("didn't work")
-            const errorCode = error.code;
-            const errorMessage = error.message;
-            // ..
+          // Handle Errors here.
+          const errorCode = error.code;
+          const errorMessage = error.message;
         });
     }
 
@@ -41,15 +49,15 @@ function Login() {
     return(
       <div className="full-container">
         <label>
-          <h2>Username</h2>
-          <input className="input-1" type="text" onChange={event => setUsername(event.target.value)} />
+          <h2>Email</h2>
+          <input className="input-1" type="text" onChange={event => setEmail(event.target.value)} />
         </label>
         <label>
           <h2>Password</h2>
           <input className="input-1" type="password" onChange={event => setPassword(event.target.value)} />
         </label>
         <div>
-          <button className="button-1" onClick={() => loginAttempt(username,password)}> Submit</button>
+          <button className="button-1" onClick={() => loginAttempt(email,password)}> Submit</button>
         </div>
         <div>
           <button className="button-1" onClick={() => handleSignUpPage()}>Sign Up</button>
@@ -59,3 +67,4 @@ function Login() {
   }
 
 export default Login;
+
