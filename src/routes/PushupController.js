@@ -1,8 +1,7 @@
-import { BrowserRouter, Route, Routes, Navigate } from 'react-router-dom';
+import { Route, Routes } from 'react-router-dom';
 import Login from '../firebase/UserAuth';  
 import PushupCounter from '../comps/PushupCounter';
-import NavBar from '../comps/NavBar';
-import { getAuth, createUserWithEmailAndPassword, signInWithEmailAndPassword, signInWithRedirect } from "firebase/auth";
+import { getAuth } from "firebase/auth";
 import {app} from '../firebase/Database';
 import {useNavigate} from 'react-router-dom';
 import { useAuthState } from "react-firebase-hooks/auth";

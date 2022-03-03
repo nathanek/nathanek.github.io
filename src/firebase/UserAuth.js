@@ -1,8 +1,7 @@
 import { setPersistence, browserLocalPersistence } from "firebase/auth";
-import { getAuth, createUserWithEmailAndPassword, signInWithEmailAndPassword, signInWithRedirect } from "firebase/auth";
+import { getAuth, signInWithEmailAndPassword } from "firebase/auth";
 import {app} from '../firebase/Database';
-import {useEffect, useState} from 'react';
-import {initializeApp} from 'firebase/app';
+import { useState} from 'react';
 import {useNavigate} from 'react-router-dom';
 import { useAuthState } from "react-firebase-hooks/auth";
 import '../styles.css';

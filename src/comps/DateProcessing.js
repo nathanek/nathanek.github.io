@@ -1,4 +1,3 @@
-import moment from "moment";
 
 export default function DateArrayFormatter(json_data){
       var obj = json_data;

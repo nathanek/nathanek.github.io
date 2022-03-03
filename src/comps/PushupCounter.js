@@ -1,15 +1,12 @@
 import '../styles.css';
-import React, { useState } from "react";
+import React from "react";
 import {db, auth} from "../firebase/Database";
-import { ref , child, get, set, update, push, onValue} from 'firebase/database';
-import TableDatePicker from './DatePicker';
-import { getAuth, createUserWithEmailAndPassword, signInWithEmailAndPassword, signInWithRedirect } from "firebase/auth";
+import { ref , child, get, set } from 'firebase/database';
 import DatePicker from "react-datepicker";
 import "react-datepicker/dist/react-datepicker.css";
 import { registerLocale, setDefaultLocale } from  "react-datepicker";
 import enAU from 'date-fns/locale/en-AU';
 import { addDays } from 'date-fns/esm';
-import InputNumberComponent from './NumberInput';
 import InputNumber from 'react-input-number';
 
 import {

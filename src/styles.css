@@ -10,48 +10,29 @@
   /* CSS */
   .button-1 {
     align-items: center;
-    background: #FFFFFF;
     border: 0 solid #E2E8F0;
     margin: 5px 0 5px;
     box-shadow: 1px 4px 6px 1px rgba(0, 0, 0, 0.1), 1px 2px 4px 1px rgba(0, 0, 0, 0.06);
     box-sizing: border-box;
     color: #1A202C;
     display: inline-flex;
-    font-family: Inter, sans-serif;
-    font-size: 1rem;
-    font-weight: 700;
+    font-size: min(20px,4vw);
     height: 56px;
     justify-content: center;
-    line-height: 24px;
-    overflow-wrap: break-word;
     padding: 24px;
-    text-decoration: none;
     border-radius: 8px;
-    cursor: pointer;
-    user-select: none;
-    -webkit-user-select: none;
     touch-action: manipulation;
   }
 
-  .card {
-    margin: 30px auto;
-    width: fit-content;
-    height: fit-content;
-    border-radius: 40px;
-  box-shadow: 1px 1px 5px 5px rgba(0,0,0,0.25), -1px -1px 5px 5px rgba(0,0,0,0.22);
-    cursor: pointer;
-    transition: 0.4s;
-  }
-
 .center-element{
-    grid-column: 5/9;
+    grid-column: 4 / 10;
     justify-content: center;
     align-items: center;
 }
 
 
 .datePicker{
-    grid-column: 5 / 9;
+    grid-column: 4 / 10;
     justify-content: center;
     align-items: center;
     top: 50%;
@@ -134,27 +115,56 @@ input {
 }
 
 .input-1 {
-    background: #FFFFFF;
+    border-radius: 8px;
+    box-shadow: 1px 4px 6px 1px rgba(0, 0, 0, 0.1), 1px 2px 4px 1px rgba(0, 0, 0, 0.06);
+    column-gap: 20px;
+    height: 70%;
+    left: 50%;
+    font-size: min(20px,4vw);
+    
+    top: 50%;
+    width: 95%;
+}
+  .input-100 {
     border: 0 solid #E2E8F0;
     column-gap: 20px;
     box-shadow: 1px 4px 6px 1px rgba(0, 0, 0, 0.1), 1px 2px 4px 1px rgba(0, 0, 0, 0.06);
     box-sizing: border-box;
-    color: #1A202C;
-    font-family: Inter, sans-serif;
     font-size: 1.5em;
-    font-weight: 700;
     justify-content: center;
-    overflow-wrap: break-word;
-    text-decoration: none;
     border-radius: 8px;
     padding: 0.5em;
-    user-select: none;
-    -webkit-user-select: none;
     touch-action: manipulation;
     width: 100%;
     height: 80%;
     left: 50%;
     top: 50%;
+  }
+
+  .button-1:hover {
+    background: #fff;
+    box-shadow: 0px 2px 10px 5px #1abc9c;
+    color: #000;
+  }
+  
+  .button-1:active:after {
+    padding: 0;
+    margin: 0;
+    opacity: 1;
+    transition: 0s
+  }
+  
+  .button-1:focus { outline:0; }
+
+  li {
+    display: block;
+    text-align: center;
+    float: left;
+  }
+  
+  li a:hover {
+    background-color: aqua;
+    color: blue;
   }
 
   .react-datepicker__input-container {
@@ -194,7 +204,7 @@ input {
 }
 
 .leftArrowGrid {
-    grid-column: 4;
+    grid-column: 3;
 }
     
 .main-container{
@@ -212,7 +222,7 @@ input {
 
 .number-input {
     column-gap: 20px;
-    grid-column: 5/9;
+    grid-column: 4/10;
     justify-content: center;
     align-items: center;
     align-content: center;
@@ -237,7 +247,7 @@ transform: rotate(-45deg);
 }
 
 .rightArrowGrid {
-    grid-column: 9;
+    grid-column: 10;
     align-items: left;
     justify-content: left;
 }
@@ -253,7 +263,7 @@ transform: rotate(-45deg);
 .react-datepicker-wrapper,
 .react-datepicker__input-container,
 .react-datepicker__input-container input {
-    font-size: 4vw;
+    font-size: min(20px,4vw);
     width: 100%;
     height: 100%;
 }
