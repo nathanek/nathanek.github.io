@@ -2,10 +2,10 @@ import React from 'react';
 import { getAuth, signOut } from "firebase/auth";
 import { useNavigate } from 'react-router-dom';
 import { Link } from 'react-router-dom';
+import {auth} from '../firebase/Database';
 
 export default function NavBar() {
     
-    const auth = getAuth();
     const navigate = useNavigate();
     const SignOutUser = () => {
         signOut(auth).then(() => {

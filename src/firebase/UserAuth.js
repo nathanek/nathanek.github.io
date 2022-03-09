@@ -17,6 +17,7 @@ function Login() {
 
     const loginAttempt = (email, password) => {
         console.log(password);
+
         setPersistence(auth, browserLocalPersistence)
         .then(() => {
           // Existing and future Auth states are now persisted in the current
@@ -24,7 +25,7 @@ function Login() {
           // if a user forgets to sign out.
           // ...
           // New sign-in will be persisted with session persistence.
-          return signInWithEmailAndPassword(auth, email, password);
+          return signInWithEmailAndPassword(auth, email.trim(), password);
         })
         .then((userCredential) => {
             // Signed in 

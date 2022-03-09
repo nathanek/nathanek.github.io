@@ -35,6 +35,9 @@ class PushupCounter extends React.Component {
     this.handleChange = this.handleChange.bind(this);
 
     this.state = {
+        lineData: "",
+        allGraphData: [],
+        graphDataLoaded: null,
         user: auth,
         displayNames:{},
         userData: {},
@@ -90,9 +93,9 @@ class PushupCounter extends React.Component {
     }
 
     getDataByDate = () => {
-        console.log(this.formatDate(this.state.date));
+        //console.log(this.formatDate(this.state.date));
         if(this.state.userData.hasOwnProperty(this.formatDate(this.state.date))) {
-            console.log('successful')
+            //console.log('successful')
             const formattedDate = this.formatDate(this.state.date)
             this.setState({completed: this.state.userData[formattedDate]})
         }
@@ -100,7 +103,7 @@ class PushupCounter extends React.Component {
     }
 
     getUserData = () => {
-        console.log(this.state.user.currentUser.uid);
+        //console.log(this.state.user.currentUser.uid);
         
         get(child(ref(db),"/members/" + auth.currentUser.uid)).then((snapshot) => {
             if (snapshot.exists()) {
@@ -108,7 +111,7 @@ class PushupCounter extends React.Component {
                   this.getDataByDate()
                   const dataTrial = this.prepareDateForRecharts();
                   this.setState({totalPushups: this.totalPushupsCompleted()})
-                  console.log(this.state.userData);
+                  //console.log(this.state.userData);
                 });
               } else {
             console.log("No data available");
@@ -126,7 +129,7 @@ class PushupCounter extends React.Component {
     }
 
     handleChange(date) {
-        console.log(date);
+        //console.log(date);
         this.setState({ date: date}, () => {
             this.getDataByDate();
         });
@@ -150,11 +153,31 @@ class PushupCounter extends React.Component {
     //this.state.userData[this.formatDate(this.state.date)] = parseInt(this.state.completed) + parseInt(this.state.inputValue);
     this.getDataByDate();
     var tempJSON = this.state.userData;
+    if (Object.keys(this.state.userData).length === 0) {
+      console.log('length of userData is 0');
+      new Promise((resolve, reject) => {
+        get(child(ref(db),"/members/" + auth.currentUser.uid)).then((snapshot) => {
+          if (snapshot.exists()) {
+            resolve(snapshot.val());
+          }
+      }).catch((err) => {console.log(err)});
+      }).then(() => {
+        tempJSON = this.state.userData;
+      }).catch((err) => {console.log(err)})
+    } else {
+      console.log('else');
+      
+    }
     tempJSON[this.formatDate(this.state.date)] = this.state.completed + this.state.inputValue;
     this.setState({userData: tempJSON},() => this.submitData(this.state.userData))
     //this.prepareDateForRecharts();
-    console.log(this.state.userData);
+    //console.log(this.state.userData);
 };
+
+  isNumeric(str) {
+    return !isNaN(str) && // use type coercion to parse the _entirety_ of the string (`parseFloat` alone does not do this)...
+          !isNaN(parseFloat(str)) // ...and ensure strings of whitespace fail  
+  }
 
   submitData = (data) => {
     set(ref(db, 'members/' + auth.currentUser.uid), data)
@@ -167,13 +190,21 @@ updateInputValue(evt) {
     console.log(evt);
     const val = evt;
     // ...
-    this.setState({
-      inputValue: val
-    });
+    if (this.isNumeric(val)){
+      this.setState({
+        inputValue: val
+      });
+    } else {
+      console.log('error: non-numeric value entered');
+    }
   }
 
   incrementInputValue(val) {
+    if (this.isNumeric(this.state.inputValue)){
       this.setState({inputValue: (this.state.inputValue + val)});
+    } else {
+      console.log('invalid input');
+    }
   }
 
   incrementDate(val) {
@@ -205,8 +236,10 @@ updateInputValue(evt) {
   getUserIds () {
     get(child(ref(db),"/users/")).then((snapshot) => {
       if (snapshot.exists()) {
-        console.log(JSON.stringify(snapshot.val()));
+        //console.log(JSON.stringify(snapshot.val()));
         this.setState({displayNames: snapshot.val()},() => {this.prepareDateForRecharts()});
+        //console.log(this.state.user);
+        //console.log(this.state.displayNames);
       } else {
         console.log("No data available");
       }
@@ -217,15 +250,15 @@ updateInputValue(evt) {
 
   handleFinishedClick() {
     new Promise ((res) => {
-      this.incrementInputValue(this.calculateDay(this.state.date)-this.state.inputValue-this.state.completed)
+      this.incrementInputValue(this.calculateDay(this.state.date)-(+this.isNumeric(this.state.inputValue)*this.state.inputValue)-this.state.completed)
       return res();
     }).then(() => {this.updateData()})
   }
   
   prepareDateForRecharts() {
-            
     get(child(ref(db),"/members/")).then((snapshot) => {
         if (snapshot.exists()) {
+            //console.log(snapshot.val());
             const codes = Object.entries(snapshot.val())
             .map(([key, value]) => { 
               const userData = Object.entries(value).map(([key2,value2]) => {
@@ -238,15 +271,74 @@ updateInputValue(evt) {
                 //console.log(JSON.stringify(this.state.displayNames));
                 return {uid: this.state.displayNames[key]["displayName"], data: graphData}
             });
-            this.setState({graphData: codes});
-            console.log(this.state.graphData);
+            //this.setState({graphData: codes});
+            
+            //console.log(JSON.stringify(codes));
+            var tempJSON = new Array(codes[0].data[0].length);
+            tempJSON = codes[0].data.map((s,index) => {
+              return tempJSON[index] = {"date":s.date}
+            });
+            //console.log(JSON.stringify(tempJSON));
+            var voidVar = codes.map((s,index) => {
+              var uid = s.uid;
+              //console.log(uid);
+              //console.log(index);
+              //console.log(JSON.stringify(s.data));
+              var iterData = s.data.map((data,i) => {
+                //console.log(data.date);
+                //console.log(data.count);
+                //console.log(i);
+                //console.log(uid);
+                //console.log(JSON.stringify(tempJSON[i]));
+                tempJSON[i][uid] = data.count; 
+                //console.log(tempJSON[i][uid]);
+                return ;
+              });
+              //console.log(JSON.stringify(tempJSON));
+              //jsonObj[s.uid] = s.data
+              //return tempJSON[index].push({...jsonObj});
+              return ;
+            });
+            //console.log(JSON.stringify(tempJSON));
+            this.setState({ graphData: tempJSON},()=>{this.generateGraphData()});
         } else {
         console.log("No data available");
         }
         }).catch((error) => {
             console.error(error);
         });
+        
     }
+
+    generateGraphData() {
+      new Promise((resolve, reject) => {
+        //console.log("made it to this point");
+        return resolve(this.loopGraphData());
+      }).then((res) => {
+        //console.log(res);
+        //console.log("made it to this point");
+        this.setState({lineData: res});
+        this.setState({graphDataLoaded: true});
+      }).catch((error) => {console.log(error);})
+    }
+
+    loopGraphData = () => {
+      var gData = this.state.graphData;
+        const jsxElements = (Object.keys(gData[0])).filter(header => {
+          if (header === 'date') {
+            return false;
+          } else {
+            return true;
+          }
+        }).map(key => {
+            //console.log(key);
+            return  <Line dataKey={key} type="monotone" stroke={"#" + Math.floor(Math.random()*16777215).toString(16)}
+            type='natural' />
+        });
+        //console.log(jsxElements);
+        this.setState({allGraphData: jsxElements});
+        return jsxElements;
+      }
 
     formatXAxis = (tickItem) => {
       return moment(tickItem).format('YYYY-MM-DD');
@@ -333,23 +425,19 @@ updateInputValue(evt) {
           <div>
             <span>Graph of progress</span>
             <ResponsiveContainer width="80%" height={200}>
-              <LineChart
-                //data={this.state.graphData}
+            <LineChart
+                data = {this.state.graphData}
                 margin={{
                     top: 5,
                     right: 30,
                     left: 20,
                     bottom: 5
                 }}
-                >
-                {this.state.graphData.map((s) => (
-
-                    <Line dataKey="count" data={s.data} name={s.uid} key={s.date} stroke={"#" + Math.floor(Math.random()*16777215).toString(16)}
-                    type='natural' />
-                ))}
-                <CartesianGrid stroke="#eee" />
+                >    
+                <CartesianGrid strokeDasharray="3 3"/>
                 <XAxis dataKey="date"  tickFormatter={this.formatXAxis} />
-                <YAxis dataKey="count" />
+                {this.state.allGraphData}
+                <YAxis />
                 <Tooltip />
                 <Legend />
               </LineChart>

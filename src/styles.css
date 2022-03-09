@@ -121,7 +121,6 @@ input {
     height: 70%;
     left: 50%;
     font-size: min(20px,4vw);
-    
     top: 50%;
     width: 95%;
 }
@@ -154,8 +153,10 @@ input {
     transition: 0s
   }
   
-  .button-1:focus { outline:0; }
-
+  .button-1:focus { 
+    outline:0;
+    box-shadow: none;
+  }
   li {
     display: block;
     text-align: center;
