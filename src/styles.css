@@ -40,7 +40,7 @@
 }
 
 .general-container {
-    width: 50vw;
+    width: 100vw;
     display:grid;
     top: 50%;
     left: 50%;

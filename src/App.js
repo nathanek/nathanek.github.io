@@ -30,7 +30,7 @@ function App() {
   return (
       <HashRouter>
         <div>
-          <h1>Julian Pushup Challenge!</h1>
+          <h1>Julian Pushup Challenge</h1>
           <NavBar/>
           <PageController/>
         </div>

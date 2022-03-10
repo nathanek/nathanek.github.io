@@ -389,10 +389,15 @@ updateInputValue(evt) {
                 </div>
               </div>
               <div className="leftArrowGrid">
-                <button className="button-1"
+              <button className="button-1"
+                    onClick={() => this.incrementInputValue(-5)}>
+                        -5
+              </button>
+              <button className="button-1"
                     onClick={() => this.incrementInputValue(-10)}>
                         -10
-                </button>
+              </button>
+                
               </div>
               <div className="number-input">
                 <InputNumber className="input-1"
@@ -404,6 +409,10 @@ updateInputValue(evt) {
                 />
               </div>
               <div className="rightArrowGrid">
+                <button className="button-1"
+                    onClick={() => this.incrementInputValue(5)}>
+                        +5
+                </button>
                 <button className="button-1"
                     onClick={() => this.incrementInputValue(10)}>
                         +10

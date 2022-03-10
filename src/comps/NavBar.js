@@ -8,28 +8,48 @@ export default function NavBar() {
     
     const navigate = useNavigate();
     const SignOutUser = () => {
-        signOut(auth).then(() => {
         // Sign-out successful.
         console.log("signed out");
-        navigate('login');
+        navigate('/login');
+        signOut(auth).then(() => {    
         }).catch((error) => {
         // An error happened.
         
         });
     }
+
+    const backButton = () => {
+        console.log(window.location.href.indexOf('signup'));
+        if (window.location.href.indexOf('signup')>0) {
+            return (
+                <li>
+                        <button className="button-1" onClick= {()=> {navigate('/login');}}>Back</button>
+                </li>
+            );
+        } else {
+            return ;
+        }
+    
+    }
+
+    const logoutButton = () => {
+        if (auth.currentUser) {
+            return (
+                <li>
+                        <button className="button-1" onClick= {()=> {SignOutUser()}}>Sign out</button>
+                </li>
+            );
+        } else {
+            return ;
+        }
+    }
+
     return (
         <div>
             <nav>
             <ul>
-                <li>
-                    <button className="button-1" onClick= {SignOutUser.bind(this)}>Sign out</button>
-                </li>
-                <li className="button-1">
-                    <Link to="/login">Login</Link>
-                </li>
-                <li className="button-1">
-                    <Link to="/dashboard">Dashboard</Link>
-                </li>  
+                {logoutButton()}
+                {backButton()}
             </ul>
           </nav>
         </div>
