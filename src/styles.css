@@ -16,16 +16,16 @@
     box-sizing: border-box;
     color: #1A202C;
     display: inline-flex;
-    font-size: min(20px,4vw);
-    height: 56px;
+    font-size: min(15px,3vw);
+    height: 5vh;
     justify-content: center;
-    padding: 24px;
+    padding: 4vw;
     border-radius: 8px;
     touch-action: manipulation;
   }
 
 .center-element{
-    grid-column: 4 / 10;
+    grid-column: 1 / 13;
     justify-content: center;
     align-items: center;
 }
@@ -39,15 +39,10 @@
     left: 50%;
 }
 
-.general-container {
-    width: 100vw;
-    display:grid;
-    top: 50%;
-    left: 50%;
+.datePickerInput{
+    grid-column: auto;
     justify-content: center;
     align-items: center;
-    text-align: center;
-  
 }
 
 .full-container {
@@ -61,17 +56,54 @@
   
 }
 
-.grid-container {
-    width: 100%;
+.general-container {
+    width: 100vw;
+    display:grid;
+    top: 50%;
+    left: 50%;
+    justify-content: center;
+    align-items: center;
+    text-align: center;
+  
+}
+
+.grid-container1 {
+    width: 100vw;
+    height: 100vh;
     display: grid;
     grid-template-columns: repeat(12,1fr);
+    grid-template-rows: repeat(20,1fr);
     align-items: center;
     text-align: center;
     justify-content: center;
+    grid-column: center;
+    background-color: yellow;
+}
+
+.bar-graph{
+    left: 50%;
+    top: 50%;
+    grid-column: 2 / 12;
+    align-items: center;
+    display: grid;
+    height: 50vh;
+    width: 50vw;
+    padding: 24px;
+    margin: 24px;
+}
+
+.graph{
+    left: 50%;
+    top: 50%;
+    grid-column: 2 / 12;
+    align-items: center;
+    display: grid;
+    height: 50vh;
+    width: 50vw;
 }
 
 .grid-full-width{
-    grid-column: 1/13;
+    grid-column: 1 / 13;
     text-align: center;
     justify-content: center;
     align-items: center;
@@ -80,16 +112,18 @@
 
 h1 { color: #111; 
     font-family: 'Helvetica Neue', sans-serif; 
-    font-size: 3em; 
+    font-size: 2em; 
     font-weight: bold; 
     letter-spacing: -1px; 
     line-height: 1; 
-    text-align: center; }
+    text-align: center; 
+    grid-column: 1/13;}
 
 
 h2 { color: #111; 
     font-family: 'Open Sans', sans-serif; 
-    font-size: 30px; font-weight: 300; 
+    font-size: 1em; 
+    font-weight: 300; 
     line-height: 32px; 
     margin: 20px 0 0px; 
     text-align: center; }
@@ -117,12 +151,7 @@ input {
 .input-1 {
     border-radius: 8px;
     box-shadow: 1px 4px 6px 1px rgba(0, 0, 0, 0.1), 1px 2px 4px 1px rgba(0, 0, 0, 0.06);
-    column-gap: 20px;
-    height: 70%;
-    left: 50%;
     font-size: min(20px,4vw);
-    top: 50%;
-    width: 95%;
 }
   .input-100 {
     border: 0 solid #E2E8F0;
@@ -205,7 +234,7 @@ input {
 }
 
 .leftArrowGrid {
-    grid-column: 3;
+    grid-column: 4;
 }
     
 .main-container{
@@ -219,6 +248,8 @@ input {
     display: grid;
     height: 100vh;
     width: 100vw;
+    grid-column: 1;
+    
 }
 
 .number-input {
@@ -249,8 +280,6 @@ transform: rotate(-45deg);
 
 .rightArrowGrid {
     grid-column: 10;
-    align-items: left;
-    justify-content: left;
 }
 
 .text {
@@ -268,3 +297,102 @@ transform: rotate(-45deg);
     width: 100%;
     height: 100%;
 }
+
+.grid-container {
+    width: 100vw;
+    height: 100vh;
+    display: grid;
+    row-gap: 0.5vh;
+    column-gap:3vw;
+    justify-items: stretch;
+    align-items: center;
+    grid-template-areas: 
+    "day day day day day day day"
+    "navToday navToday navToday navToday navToday navToday navToday"
+    ". . lArrow date rArrow . . "
+    "progression progression progression progression progression progression progression"
+    ". take5 take5 counter add5 add5 ." 
+    ". take10 take10 counter add10 add10 ."
+    ". . submit submit submit . ."
+    ". . finished finished finished . ."
+    ". barChart barChart barChart barChart barChart ."
+    ". lineChart lineChart lineChart lineChart lineChart ."
+    ". . . . . . ."
+    ". . pushupCount pushupCount pushupCount . .";
+}
+
+.item-a{
+    grid-area: day;
+}
+
+.item-b{
+    grid-area: navToday;
+    justify-self: center;
+}
+
+.item-c{
+    grid-area: lArrow;
+    justify-self: right;
+}
+
+.item-d{
+    grid-area: date;
+}
+
+.item-e{
+    grid-area: rArrow;
+}
+
+.item-f{
+    grid-area: progression;
+}
+
+.item-g{
+    grid-area: take5;
+    justify-self: right;
+}
+
+.item-h{
+    grid-area: take10;
+    justify-self: right;
+}
+.item-i{
+    grid-area: counter;
+    justify-self: center;
+}
+
+.item-j{
+    grid-area: add5;
+}
+
+.item-k{
+    grid-area: add10;
+}
+
+.item-l{
+    grid-area: submit;
+    justify-self: center;
+}
+
+.item-m{
+    grid-area: finished;
+    justify-self: center;
+}
+.item-n{
+    grid-area: barChart;
+    justify-self: center;
+    width: 80vw;
+    height:40vh;
+}
+.item-o{
+    grid-area: lineChart;
+    justify-self: center;
+    width: 80vw;
+    height:40vh;
+}
+.item-p{
+    grid-area: pushupCount;
+    justify-self: center;
+    padding: 3vh;
+}
+

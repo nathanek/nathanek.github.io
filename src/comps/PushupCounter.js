@@ -12,12 +12,15 @@ import InputNumber from 'react-input-number';
 import {
     ResponsiveContainer,
     LineChart,
+    BarChart,
+    Bar,
     Line,
     XAxis,
     YAxis,
     CartesianGrid,
     Tooltip,
-    Legend
+    Legend,
+    LabelList
   } from "recharts";
 import moment from "moment";
 import DateProcessing from "./DateProcessing";
@@ -36,7 +39,10 @@ class PushupCounter extends React.Component {
 
     this.state = {
         lineData: "",
+        dataLoaded: false,
         allGraphData: [],
+        barGraphData: [],
+        barGraphObjects: [],
         graphDataLoaded: null,
         user: auth,
         displayNames:{},
@@ -45,7 +51,8 @@ class PushupCounter extends React.Component {
         completed : 0,
         inputValue: 0,
         graphData: [],
-        totalPushups: 0
+        totalPushups: 0,
+        pushupTally: 0
     };  
   }
 
@@ -53,7 +60,7 @@ class PushupCounter extends React.Component {
     registerLocale('en-AU', enAU);
     auth.onAuthStateChanged( (user) => {
       //console.log(JSON.stringify(user));
-      if (user != null) {
+      if (user) {
         this.setState({ user: user},this.getUserData())
         this.getUserIds();
         //this.prepareDateForRecharts();
@@ -108,9 +115,10 @@ class PushupCounter extends React.Component {
         get(child(ref(db),"/members/" + auth.currentUser.uid)).then((snapshot) => {
             if (snapshot.exists()) {
                 this.setState({userData: snapshot.val()},()=>{
-                  this.getDataByDate()
+                  this.setState({dataLoaded: true});
+                  this.getDataByDate();
                   const dataTrial = this.prepareDateForRecharts();
-                  this.setState({totalPushups: this.totalPushupsCompleted()})
+                  
                   //console.log(this.state.userData);
                 });
               } else {
@@ -132,6 +140,7 @@ class PushupCounter extends React.Component {
         //console.log(date);
         this.setState({ date: date}, () => {
             this.getDataByDate();
+            this.loopBarGraphData();
         });
     }
   handleSubmit = event => {
@@ -169,10 +178,16 @@ class PushupCounter extends React.Component {
       
     }
     tempJSON[this.formatDate(this.state.date)] = this.state.completed + this.state.inputValue;
-    this.setState({userData: tempJSON},() => this.submitData(this.state.userData))
+    this.setState({userData: tempJSON},() => { 
+      this.setState({totalPushups: this.totalPushupsCompleted()}, ()=>{
+        this.setState({pushupTally: this.state.totalPushups-this.calculateDay(new Date())*(this.calculateDay(new Date())+1)/2}, ()=>{
+          this.submitData(this.state.userData);  
+        });
+      })
+    });
+  }
     //this.prepareDateForRecharts();
     //console.log(this.state.userData);
-};
 
   isNumeric(str) {
     return !isNaN(str) && // use type coercion to parse the _entirety_ of the string (`parseFloat` alone does not do this)...
@@ -210,7 +225,10 @@ updateInputValue(evt) {
   incrementDate(val) {
     //console.log(this.state.date);
     //console.log(addDays(this.state.date,val));
-    this.setState({date: addDays(this.state.date,val)},() => {this.getDataByDate();})
+    this.setState({date: addDays(this.state.date,val)},() => {
+      this.getDataByDate();
+      this.loopBarGraphData();
+    })
   }
 
   calculateDay(date) {
@@ -319,6 +337,8 @@ updateInputValue(evt) {
         //console.log("made it to this point");
         this.setState({lineData: res});
         this.setState({graphDataLoaded: true});
+        this.loopBarGraphData()
+        return ;
       }).catch((error) => {console.log(error);})
     }
 
@@ -330,111 +350,163 @@ updateInputValue(evt) {
           } else {
             return true;
           }
-        }).map(key => {
+        }).map((key,index) => {
             //console.log(key);
-            return  <Line dataKey={key} type="monotone" stroke={"#" + Math.floor(Math.random()*16777215).toString(16)}
-            type='natural' />
+            return  <Line dataKey={key} type="monotone" stroke={"#" + Math.floor((index+1)*1677721.5).toString(16)}
+            dot={false} />
         });
         //console.log(jsxElements);
         this.setState({allGraphData: jsxElements});
         return jsxElements;
       }
 
+      loopBarGraphData = () => {
+        if (typeof this.state.graphData[this.calculateDay(this.state.date)-1]=== 'undefined') {
+          //Do nothing
+        } else {
+          var gData = this.state.graphData.slice(this.calculateDay(this.state.date)-1,this.calculateDay(this.state.date));
+          console.log(gData);
+            const jsxElements = (Object.keys(gData)).map((key,index) => {
+                console.log(key);
+                gData[key].date = moment(gData[key].date).format('DD-MMM');
+                return gData[key]
+            });
+            
+            const barChartElements = (Object.keys(gData[0])).filter(header => {
+              if (header === 'date') {
+                return false;
+              } else {
+                return true;
+              }
+              }).map((key,index) => {
+              return  <Bar isAnimationActive={false} dataKey={key} fill={"#" + Math.floor((index+1)*1677721.5).toString(16)} >
+                        <LabelList dataKey={key} position="top" />
+                      </Bar>
+              });
+              
+            this.setState({barGraphObjects: barChartElements},
+            () => {
+              this.setState({barGraphData: jsxElements});
+            });
+            console.log(JSON.stringify(jsxElements));
+            return jsxElements;
+          }
+        }
+
     formatXAxis = (tickItem) => {
-      return moment(tickItem).format('YYYY-MM-DD');
+      return moment(tickItem).format('YY-MM-DD');
     }
     
+    finishedButton = () => {
+      return(
+        <button className="button-1"
+          onClick={() => this.handleFinishedClick()}>
+              Finished today!
+        </button>
+      );
+    }
+
+    submitButton = () => {
+     return(  
+      <button  onClick={() => this.updateData()}  className="button-1">
+        Submit
+      </button>
+     );
+    }
 
   render() {
     return (
       <React.Fragment>
-        <div className="main-grid-container">
-          <h1>Day {this.calculateDay(this.state.date)}</h1>
-          <div>
-            <div className="grid-container">
-              <div className="center-element">
-                <button className="button-1" onClick={() => this.handleChange(new Date())}>Go to today</button>
-              </div>
-            </div>
-            <div className="grid-container">
-              <div className="leftArrowGrid">
-                <button className="button-1"
-                    onClick={() => this.incrementDate(-1)}>
-                        <i class="arrow left"></i>
-                </button>
-              </div>
-              <div className="datePicker input-1">
-                <DatePicker className="input-1"
-                    locale="en-AU" 
-                    dateFormat="P"
-                    selected={this.state.date} 
-                    onChange={date => this.handleChange(date)} />
-              </div>
-              <div className="rightArrowGrid">
-                <button className="button-1"
-                    onClick={() => this.incrementDate(1)}>
-                        <i class="arrow right"></i>
-                </button>  
-              </div>                
-            </div>
-            <div className="grid-container">
-              <label className="grid-full-width">Pushups Completed Today</label>
-              <div className="grid-full-width">
-                <div className="quarter-parent-width">
-                  <CircularProgressbar
-                    value={this.state.completed} 
-                    maxValue={this.calculateDay(this.state.date)} 
-                    text={`${this.state.completed}/${this.calculateDay(this.state.date)}`} 
-                  />
-                </div>
-              </div>
-              <div className="leftArrowGrid">
-              <button className="button-1"
-                    onClick={() => this.incrementInputValue(-5)}>
-                        -5
-              </button>
-              <button className="button-1"
-                    onClick={() => this.incrementInputValue(-10)}>
-                        -10
-              </button>
-                
-              </div>
-              <div className="number-input">
-                <InputNumber className="input-1"
-                  min={10} 
-                  max={366} 
-                  step={1} 
-                  value={this.state.inputValue} 
-                  onChange={evt => this.updateInputValue(evt)}
+        <div className="grid-container" >
+          <h1 className="item-a">Day {this.calculateDay(this.state.date)}</h1>
+          <div className="item-b">
+            <button className="button-1" onClick={() => this.handleChange(new Date())}>Go to today</button>
+          </div>
+          <div className="item-c">
+            <button className="button-1"
+                onClick={() => this.incrementDate(-1)}>
+                    <i class="arrow left"></i>
+            </button>
+          </div>
+          <div className="item-d">
+            <DatePicker className="input-1"
+                locale="en-AU" 
+                dateFormat="P"
+                selected={this.state.date} 
+                onChange={date => this.handleChange(date)} />
+          </div>
+          <div className="item-e">
+            <button className="button-1"
+                onClick={() => this.incrementDate(1)}>
+                    <i class="arrow right"></i>
+            </button>  
+          </div>                
+          <div className="item-f">
+            <label className="grid-full-width" >Pushups Completed Today</label>
+            <div className="grid-full-width">
+              <div className="quarter-parent-width">
+                <CircularProgressbar
+                  value={this.state.completed} 
+                  maxValue={this.calculateDay(this.state.date)} 
+                  text={`${this.state.completed}/${this.calculateDay(this.state.date)}`} 
                 />
-              </div>
-              <div className="rightArrowGrid">
-                <button className="button-1"
-                    onClick={() => this.incrementInputValue(5)}>
-                        +5
-                </button>
-                <button className="button-1"
-                    onClick={() => this.incrementInputValue(10)}>
-                        +10
-                </button>
-              </div>
-              <div className="center-element">
-                <button  onClick={() => this.updateData()}  className="button-1">
-                  Submit
-                </button>
-              </div>
-              <div className="center-element">
-                <button className="button-1"
-                  onClick={() => this.handleFinishedClick()}>
-                      Finished today!
-                </button>
               </div>
             </div>
           </div>
-          <div>
+          <div className="item-g" grid-columns="">
+            <button className="button-1"
+                  onClick={() => this.incrementInputValue(-5)}>
+                      -5
+            </button>
+          </div>
+          <div className="item-h" grid-columns="">
+            <button className="button-1"
+                  onClick={() => this.incrementInputValue(-10)}>
+                      -10
+            </button>
+          </div>
+          <div className="item-i">
+            <InputNumber className="input-1"
+              min={10} 
+              max={366} 
+              step={1} 
+              value={this.state.inputValue} 
+              onChange={evt => this.updateInputValue(evt)}
+            />
+          </div>
+          <div className="item-j">
+            <button className="button-1"
+                onClick={() => this.incrementInputValue(5)}>
+                    +5
+            </button>
+          </div>
+          <div className="item-k">
+            <button className="button-1"
+                onClick={() => this.incrementInputValue(10)}>
+                    +10
+            </button>
+          </div>
+          <div className="item-l">
+            {this.state.dataLoaded && this.submitButton()}
+          </div>
+          <div className="item-m">
+            {this.state.dataLoaded && this.finishedButton()}
+          </div>
+          <div className="item-n">
+            <ResponsiveContainer>
+              <BarChart data={this.state.barGraphData}>
+                <CartesianGrid strokeDasharray="3 3" />
+                <XAxis dataKey="date"/>
+                <YAxis type="number" domain={[0, this.calculateDay(this.state.date)*1.5]}/>
+                <Legend align="center" />
+                {this.state.barGraphObjects}  
+              </BarChart>
+            </ResponsiveContainer>
+          </div>
+          <div className="item-o">
             <span>Graph of progress</span>
-            <ResponsiveContainer width="80%" height={200}>
-            <LineChart
+              <ResponsiveContainer width="99%">
+              <LineChart
                 data = {this.state.graphData}
                 margin={{
                     top: 5,
@@ -444,19 +516,19 @@ updateInputValue(evt) {
                 }}
                 >    
                 <CartesianGrid strokeDasharray="3 3"/>
+                <Legend layout="horizontal"/>
                 <XAxis dataKey="date"  tickFormatter={this.formatXAxis} />
                 {this.state.allGraphData}
                 <YAxis />
                 <Tooltip />
-                <Legend />
               </LineChart>
             </ResponsiveContainer>  
           </div>
-          <div>
-            Pushups to date: {this.calculateDay(new Date())*(this.calculateDay(new Date())+1)/2}
-          </div>
-          <div>
-            Pushups infront: {this.state.totalPushups-this.calculateDay(new Date())*(this.calculateDay(new Date())+1)/2}
+          <div className="item-p">
+            <p>
+              Pushups to date: {this.calculateDay(new Date())*(this.calculateDay(new Date())+1)/2} 
+              <br></br>Pushups infront: {this.state.pushupTally}
+            </p>
           </div>
         </div>
       </React.Fragment>
