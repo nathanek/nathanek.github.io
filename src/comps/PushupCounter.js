@@ -352,12 +352,55 @@ updateInputValue(evt) {
           }
         }).map((key,index) => {
             //console.log(key);
-            return  <Line dataKey={key} type="monotone" stroke={"#" + Math.floor((index+1)*1677721.5).toString(16)}
+            return  <Line dataKey={key} type="monotone" stroke={this.createBoldColourFromInteger(index)}
             dot={false} />
         });
         //console.log(jsxElements);
         this.setState({allGraphData: jsxElements});
         return jsxElements;
+      }
+      
+      componentToHex(c) {
+        var hex = c.toString(16);
+        return hex.length == 1 ? "0" + hex : hex;
+      }
+      
+      rgbToHex(r, g, b) {
+        return "#" + this.componentToHex(r) + this.componentToHex(g) + this.componentToHex(b);
+      }
+
+      createBoldColourFromInteger(num){
+        let a=0
+        let b=0
+        let c=0
+        switch (num % 6){
+          case 0:
+            a = 255/(1+num/6)
+            break;
+          case 1:
+            b = 255/(1+num/6)
+            break;
+          case 2:
+            c = 255/(1+num/6)
+            break;
+          case 3:
+            a = 255/(1+num/6)
+            b = 255/(1+num/6)
+            break;
+          case 4:
+            b = 255/(1+num/6)
+            c = 255/(1+num/6)
+            break;
+          case 5:
+            a = 255/(1+num/6)
+            c = 255/(1+num/6)
+            break;
+            default:
+              console.log("error")
+        }
+        console.log(a + " " + b + " " + c);
+        console.log(this.rgbToHex(Math.round(a),Math.round(b),Math.round(c)));
+        return (this.rgbToHex(Math.round(a),Math.round(b),Math.round(c)))
       }
 
       loopBarGraphData = () => {
@@ -379,7 +422,7 @@ updateInputValue(evt) {
                 return true;
               }
               }).map((key,index) => {
-              return  <Bar isAnimationActive={false} dataKey={key} fill={"#" + Math.floor((index+1)*1677721.5).toString(16)} >
+              return  <Bar isAnimationActive={false} dataKey={key} fill={this.createBoldColourFromInteger(index)} >
                         <LabelList dataKey={key} position="top" />
                       </Bar>
               });

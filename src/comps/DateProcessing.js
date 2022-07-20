@@ -27,7 +27,7 @@ export default function DateArrayFormatter(json_data){
             }  
             count++;
             //console.log(count);
-            //console.log(JSON.stringify(obj));
+            console.log(JSON.stringify(obj));
          }
       }
       //console.log(JSON.stringify(obj));
